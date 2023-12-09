@@ -1,0 +1,36 @@
+{
+  "name": "spion-trade-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/server.js",
+    "main": "node lib/main.js",
+    "dev:main": "tsx src/main.ts",
+    "dev:server": "tsx src/server.ts",
+    "dev": "tsx src/dev.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "date-fns-tz": "^2.0.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "firebase-admin": "^11.11.0",
+    "ws": "^8.14.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/ws": "^8.5.10",
+    "tsup": "^8.0.1",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3"
+  }
+}
