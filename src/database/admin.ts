@@ -1,7 +1,5 @@
 import * as admin from 'firebase-admin';
 
-import { env } from '../config/env';
-
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -11,7 +9,7 @@ if (!admin.apps.length) {
         'firebase-adminsdk-l3q82@ia-spion-trade.iam.gserviceaccount.com',
       projectId: 'ia-spion-trade',
     }),
-    databaseURL: `https://${env.FIREBASE_ADMIN_PROJECT_ID}.firebaseio.com`,
+    databaseURL: `https://ia-spion-trade.firebaseio.com`,
   });
 }
 

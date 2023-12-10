@@ -16,7 +16,7 @@ interface Operation {
   direction: string;
 }
 
-const SERVER_URL = 'server-typescript-d6268.ondigitalocean.app';
+const SERVER_URL = 'https://server-typescript-d6268.ondigitalocean.app';
 
 function parseOperations(operations: string): Operation[] {
   const parsed = operations.split(' ').map((operation) => {
@@ -68,7 +68,7 @@ async function triggerOperations(operation: Operation): Promise<void> {
   );
 
   const promises = users.map((user) =>
-    axios.post(SERVER_URL + '/operation', {
+    axios.post(SERVER_URL + '/operate', {
       user,
       operation,
     })
@@ -79,7 +79,11 @@ async function triggerOperations(operation: Operation): Promise<void> {
   await Promise.all(promises);
 }
 
+console.log('running clicle');
+
 schedule.scheduleJob('0 * * * * *', async () => {
+  console.log('running clicle');
+
   const doc = await db.collection('system').doc('private').get();
 
   const operations = parseOperations(doc.data()!.operations);

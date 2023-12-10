@@ -33,7 +33,7 @@ export class Bot {
   private mode: 'real' | 'demo';
 
   public constructor(private user: User) {
-    const { email, password, ssid } = user.broker;
+    const { email, password, ssid } = user.quotex;
 
     this.API = new Exnova(email, password, ssid);
 
@@ -79,8 +79,8 @@ export class Bot {
     await this.updateUser({
       realBalance: this.API.realBalance(),
       demoBalance: this.API.demoBalance(),
-      broker: {
-        ...this.user.broker,
+      quotex: {
+        ...this.user.quotex,
         ssid: this.API.SSID()!,
       },
     });
