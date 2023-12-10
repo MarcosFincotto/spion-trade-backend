@@ -299,7 +299,7 @@ export class Exnova {
         price,
         active_id: ACTIVES[active],
         expired,
-        direction,
+        direction: direction.toLocaleLowerCase(),
         option_type_id: option,
         user_balance_id: this.balances[mode].id,
       },

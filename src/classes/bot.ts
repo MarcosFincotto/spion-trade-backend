@@ -176,7 +176,9 @@ export class Bot {
     duration,
   }: Operation): Promise<OperationResponse> {
     if (time) {
+      console.log('waiting for time');
       await waitForTime(time);
+      console.log('time waited');
     }
 
     let transacted = 0;

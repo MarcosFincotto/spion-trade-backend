@@ -37,8 +37,6 @@ export type User = {
   config: {
     mode: 'real' | 'demo';
 
-    trader: string;
-
     entry: number;
 
     gales: number;
