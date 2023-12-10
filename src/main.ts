@@ -7,8 +7,6 @@ import { db } from './database/admin';
 import { parse, addMinutes, format } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 
-import { env } from './config/env';
-
 import type { User } from './types/User';
 
 interface Operation {
@@ -17,6 +15,8 @@ interface Operation {
   time: string;
   direction: string;
 }
+
+const SERVER_URL = 'server-typescript-d6268.ondigitalocean.app';
 
 function parseOperations(operations: string): Operation[] {
   const parsed = operations.split(' ').map((operation) => {
@@ -68,7 +68,7 @@ async function triggerOperations(operation: Operation): Promise<void> {
   );
 
   const promises = users.map((user) =>
-    axios.post(env.SERVER_URL + '/operation', {
+    axios.post(SERVER_URL + '/operation', {
       user,
       operation,
     })
