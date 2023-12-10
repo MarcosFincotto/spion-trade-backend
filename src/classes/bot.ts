@@ -56,15 +56,6 @@ export class Bot {
   }
 
   public async init(): Promise<boolean> {
-    if (!this.user.config.broker) {
-      await this.updateUser({
-        isActive: false,
-        status: 'Erro ao conectar: reinicie seu bot',
-      });
-
-      return false;
-    }
-
     const connected = await this.API.establishConnection();
 
     if (!connected) {

@@ -46,8 +46,6 @@ export type User = {
 
     stopWin: number;
     stopLoss: number;
-
-    broker: 'dayprofit' | 'iqoption';
   };
 
   operations: Operation[];
