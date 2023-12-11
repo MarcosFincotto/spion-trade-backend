@@ -68,6 +68,7 @@ export class Bot {
     }
 
     await this.updateUser({
+      balance: this.API.realBalance(),
       realBalance: this.API.realBalance(),
       demoBalance: this.API.demoBalance(),
       quotex: {
@@ -176,9 +177,7 @@ export class Bot {
     duration,
   }: Operation): Promise<OperationResponse> {
     if (time) {
-      console.log('waiting for time');
       await waitForTime(time);
-      console.log('time waited');
     }
 
     let transacted = 0;
@@ -230,6 +229,7 @@ export class Bot {
 
       await this.updateUser({
         status: 'Realizando operação',
+        balance: this.getBalance('real'),
         realBalance: this.getBalance('real'),
         demoBalance: this.getBalance('demo'),
         balanceTrack: this.balanceTrack,
@@ -257,6 +257,7 @@ export class Bot {
 
         await this.updateUser({
           status: 'Analisando o mercado',
+          balance: this.getBalance('real'),
           realBalance: this.getBalance('real'),
           demoBalance: this.getBalance('demo'),
           balanceTrack: this.balanceTrack,
@@ -316,6 +317,7 @@ export class Bot {
       await this.updateUser({
         isActive: is_active,
         status,
+        balance: this.getBalance('real'),
         realBalance: this.getBalance('real'),
         demoBalance: this.getBalance('demo'),
         operations: this.operations,

@@ -26,8 +26,10 @@ function parseOperations(operations: string): Operation[] {
       return null;
     }
 
-    const [, durationStr, active, time, direction] = match;
-    const duration = parseInt(durationStr, 10) * 60;
+    const [, durationStr, active, time, directionStr] = match;
+
+    const duration = parseInt(durationStr, 10);
+    const direction = directionStr.toLocaleLowerCase();
 
     return {
       active,

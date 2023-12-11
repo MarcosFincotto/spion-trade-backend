@@ -31,6 +31,7 @@ export type User = {
 
   isActive: boolean;
 
+  balance: number;
   realBalance: number;
   demoBalance: number;
 
