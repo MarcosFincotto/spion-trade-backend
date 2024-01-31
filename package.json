@@ -9,7 +9,8 @@
     "main": "node lib/main.js",
     "dev:main": "tsx src/main.ts",
     "dev:server": "tsx src/server.ts",
-    "dev": "tsx src/dev.ts"
+    "dev": "tsx src/dev.ts",
+    "test": "tsx src/test.ts"
   },
   "keywords": [],
   "author": "",
