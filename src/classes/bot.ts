@@ -33,7 +33,7 @@ export class Bot {
   private mode: 'real' | 'demo';
 
   public constructor(private user: User) {
-    const { email, password, ssid } = user.quotex;
+    const { email, password, ssid } = user.broker;
 
     this.API = new Exnova(email, password, ssid);
 
@@ -67,12 +67,18 @@ export class Bot {
       return false;
     }
 
+    console.log({
+      index: 1,
+      balance: this.getBalance(),
+      APIBalance: this.API.realBalance(),
+    });
+
     await this.updateUser({
       balance: this.API.realBalance(),
       realBalance: this.API.realBalance(),
       demoBalance: this.API.demoBalance(),
-      quotex: {
-        ...this.user.quotex,
+      broker: {
+        ...this.user.broker,
         ssid: this.API.SSID()!,
       },
     });
@@ -97,6 +103,8 @@ export class Bot {
   }
 
   private changeBalance(change: number): void {
+    console.log({ called: true, change, mode: this.mode });
+
     if (this.mode === 'real') {
       this._real_balance += change;
     }
@@ -108,7 +116,7 @@ export class Bot {
 
   private _operations = this.user.operations;
 
-  get operations() {
+  private get operations() {
     return this._operations;
   }
 
@@ -216,7 +224,11 @@ export class Bot {
         };
       }
 
+      console.log({ balance: this.getBalance(), price });
+
       this.changeBalance(-price);
+
+      console.log({ newBalance: this.getBalance() });
 
       const now = currentTime();
 
@@ -229,7 +241,7 @@ export class Bot {
 
       await this.updateUser({
         status: 'Realizando operação',
-        balance: this.getBalance('real'),
+        balance: this.getBalance(),
         realBalance: this.getBalance('real'),
         demoBalance: this.getBalance('demo'),
         balanceTrack: this.balanceTrack,
@@ -317,7 +329,7 @@ export class Bot {
       await this.updateUser({
         isActive: is_active,
         status,
-        balance: this.getBalance('real'),
+        balance: this.getBalance(),
         realBalance: this.getBalance('real'),
         demoBalance: this.getBalance('demo'),
         operations: this.operations,

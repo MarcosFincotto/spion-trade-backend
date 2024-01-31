@@ -15,7 +15,12 @@ const operation = Router();
 operation.post('/operate', async (req: Request, res: Response) => {
   const { user, operation }: RequestBody = req.body;
 
-  console.log({ user: user.email, operation: operation.active });
+  console.log({
+    user: user.email,
+    balance: user.balance,
+    realBalance: user.realBalance,
+    operation: operation.active,
+  });
 
   const bot = new Bot(user);
 

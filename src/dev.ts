@@ -18,10 +18,10 @@ async function main() {
   } as User;
 
   const operation: Operation = {
-    active: 'EURUSD',
+    active: 'EURUSD-OTC',
     direction: 'call',
     duration: 1,
-    time: '12:29',
+    time: '10:00',
   };
 
   return await axios.post('http://localhost:6969/operate', {

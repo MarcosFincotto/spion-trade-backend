@@ -21,7 +21,7 @@ export type User = {
 
   licenseUntil: Timestamp;
 
-  quotex: {
+  broker: {
     email: string;
     password: string;
     ssid: string;
@@ -37,6 +37,8 @@ export type User = {
 
   config: {
     mode: 'real' | 'demo';
+
+    strategy: string;
 
     entry: number;
 
