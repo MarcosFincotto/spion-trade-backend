@@ -265,8 +265,6 @@ export class Exnova {
 
     const auth = await Exnova.authenticate(this.email, this.password);
 
-    console.log({ ref: 'Exnova.authenticate', auth });
-
     if (!auth.success) {
       return false;
     }
