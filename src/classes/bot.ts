@@ -268,7 +268,7 @@ export class Bot {
         await this.removeBalanceTrack(track);
 
         await this.updateUser({
-          status: 'Analisando o mercado',
+          status: 'Analisando possível entrada',
           balance: this.getBalance('real'),
           realBalance: this.getBalance('real'),
           demoBalance: this.getBalance('demo'),
@@ -305,10 +305,12 @@ export class Bot {
       const toStop = win || !!stop;
 
       let is_active = !stop;
-      let status = toStop ? 'Analisando o mercado' : 'Realizando operação';
+      let status = toStop
+        ? 'Analisando possível entrada'
+        : 'Realizando operação';
 
       if (!win && gale === gales) {
-        status = 'Analisando o mercado';
+        status = 'Analisando possível entrada';
       }
 
       if (!is_active) {
