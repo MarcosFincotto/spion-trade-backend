@@ -1,6 +1,7 @@
 import { admin, db } from '../database/admin';
 
 import { Exnova } from '../api/exnova';
+import { Bullex } from '../api/bullex';
 
 import { currentTime, waitForTime } from '../helpers/time';
 
@@ -13,7 +14,7 @@ interface OperationResponse {
 }
 
 export class Bot {
-  private API: Exnova;
+  private API: Exnova | Bullex;
 
   private readonly query = db.collection('users').doc(this.user.id);
 
@@ -35,7 +36,7 @@ export class Bot {
   public constructor(private user: User) {
     const { email, password, ssid } = user.broker;
 
-    this.API = new Exnova(email, password, ssid);
+    this.API = new Bullex(email, password, ssid);
 
     this.mode = this.user.config.mode;
   }

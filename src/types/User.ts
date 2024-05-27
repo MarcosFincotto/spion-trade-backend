@@ -51,4 +51,6 @@ export type User = {
 
   operations: Operation[];
   balanceTrack: BalanceTrack[];
+
+  // broker
 };
