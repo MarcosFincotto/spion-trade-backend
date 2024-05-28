@@ -4,7 +4,7 @@ const email = 'srcanaloficial@gmail.com';
 const password = 'samsung2674';
 
 export async function test() {
-  const auth = await Bot.authenticate(email, password);
+  const auth = await Bot.authenticate(email, password, 'bullex');
 
   console.log(auth);
 

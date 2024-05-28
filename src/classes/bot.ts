@@ -36,13 +36,23 @@ export class Bot {
   public constructor(private user: User) {
     const { email, password, ssid } = user.broker;
 
-    this.API = new Bullex(email, password, ssid);
+    this.API = {
+      exnova: new Exnova(email, password, ssid),
+      bullex: new Bullex(email, password, ssid),
+    }[user.broker.name];
 
     this.mode = this.user.config.mode;
   }
 
-  public static async authenticate(email: string, password: string) {
-    const API = new Bullex(email, password);
+  public static async authenticate(
+    email: string,
+    password: string,
+    broker: 'exnova' | 'bullex'
+  ) {
+    const API: Exnova | Bullex = {
+      exnova: new Exnova(email, password),
+      bullex: new Bullex(email, password),
+    }[broker];
 
     const success = await API.establishConnection();
 

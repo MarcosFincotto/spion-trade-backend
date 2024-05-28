@@ -22,6 +22,7 @@ export type User = {
   licenseUntil: Timestamp;
 
   broker: {
+    name: 'exnova' | 'bullex';
     email: string;
     password: string;
     ssid: string;
@@ -51,6 +52,4 @@ export type User = {
 
   operations: Operation[];
   balanceTrack: BalanceTrack[];
-
-  // broker
 };

@@ -2,11 +2,14 @@ import { Router, Request, Response } from 'express';
 
 import { Bot } from '../../classes/bot';
 
+import { BROKERS } from '../../types/broker';
+
 const authentication = Router();
 
 import { z } from 'zod';
 
 const schema = z.object({
+  broker: z.enum(BROKERS),
   email: z.string().min(1),
   password: z.string().min(1),
 });
@@ -21,9 +24,9 @@ authentication.post('/authenticate', async (req: Request, res: Response) => {
     });
   }
 
-  const { email, password } = validation.data;
+  const { broker, email, password } = validation.data;
 
-  const auth = await Bot.authenticate(email, password);
+  const auth = await Bot.authenticate(email, password, broker);
 
   return res.status(200).json(auth);
 });
