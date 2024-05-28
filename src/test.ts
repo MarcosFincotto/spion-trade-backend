@@ -1,6 +1,6 @@
 import { Bot } from './classes/bot';
 
-const email = 'samuel.rochaat@gmail.com';
+const email = 'srcanaloficial@gmail.com';
 const password = 'samsung2674';
 
 export async function test() {

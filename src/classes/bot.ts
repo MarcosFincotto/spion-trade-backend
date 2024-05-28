@@ -42,7 +42,7 @@ export class Bot {
   }
 
   public static async authenticate(email: string, password: string) {
-    const API = new Exnova(email, password);
+    const API = new Bullex(email, password);
 
     const success = await API.establishConnection();
 
