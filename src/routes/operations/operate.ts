@@ -22,7 +22,7 @@ operation.post('/operate', async (req: Request, res: Response) => {
     operation: operation.active,
   });
 
-  const bot = new Bot(user);
+  const bot = new Bot(user, operation);
 
   const connected = await bot.init();
 

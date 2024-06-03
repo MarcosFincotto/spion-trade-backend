@@ -11,6 +11,14 @@ interface Balance {
   amount: number;
 }
 
+interface Price {
+  strike: string;
+  call: { symbol: string };
+  put: {
+    symbol: string;
+  };
+}
+
 type AuthSuccess = {
   success: true;
   ssid: string;
@@ -46,9 +54,10 @@ type BuyFailure = {
 };
 
 interface BuyAndCheckWinResponse {
-  id: number;
-  win: 'win' | 'equal' | 'loose';
-  profit_amount: string;
+  digital_options_position_changed1: {
+    order_ids: [number];
+  };
+  close_profit: number;
 }
 
 type BuyAndCheckWinSuccess = {
@@ -66,22 +75,20 @@ const DEBUG = true;
 const UNINSTERESTED = [
   'timeSync',
   'heartbeat',
-  'front',
   'profile',
-  'balance-changed',
-  'chat-state-updated',
-  'option-archived',
-  'option-changed',
+  'front',
+  // 'balance-changed',
   'user-settings-changed',
+  'client-price-generated',
 ];
 
-export class Bullex {
+export class BullexDigital {
   private static readonly TIMEOUT = 30 * 1000;
 
   private static readonly HOST = 'trade.bull-ex.com';
 
   private static readonly HTTPS_URL = `https://api.${this.HOST}/v2`;
-  private static readonly WWS_URL = `wss://${this.HOST}/echo/websocket`;
+  private static readonly WWS_URL = `wss://ws.${this.HOST}/echo/websocket`;
 
   private serverTimestamp: number | null = null;
 
@@ -155,11 +162,11 @@ export class Bullex {
     let timeoutId: NodeJS.Timeout;
 
     const timeout = new Promise<void>((resolve) => {
-      timeoutId = setTimeout(resolve, Bullex.TIMEOUT * 1000);
+      timeoutId = setTimeout(resolve, BullexDigital.TIMEOUT * 1000);
     });
 
     const connection = new Promise<void>((resolve) => {
-      this.socket = new WebSocket(Bullex.WWS_URL);
+      this.socket = new WebSocket(BullexDigital.WWS_URL);
 
       this.socket.on('message', (data) => this.onMessage(data));
 
@@ -229,7 +236,7 @@ export class Bullex {
 
     const response = await this.event.waitForEvent<SSIDResponse | false>(
       'profile',
-      Bullex.TIMEOUT,
+      BullexDigital.TIMEOUT,
       () => this.sendMessage('ssid', this.ssid)
     );
 
@@ -251,7 +258,7 @@ export class Bullex {
       return false;
     }
 
-    await this.event.waitForEvent<number>('timeSync', Bullex.TIMEOUT);
+    await this.event.waitForEvent<number>('timeSync', BullexDigital.TIMEOUT);
 
     if (!this.serverTimestamp) {
       return false;
@@ -263,7 +270,7 @@ export class Bullex {
       return true;
     }
 
-    const auth = await Bullex.authenticate(this.email, this.password);
+    const auth = await BullexDigital.authenticate(this.email, this.password);
 
     if (!auth.success) {
       return false;
@@ -290,24 +297,91 @@ export class Bullex {
       throw new Error('API connection is not established');
     }
 
-    const [expired, option] = getExpirationTime(this.serverTimestamp, duration);
+    const getInstrumentsResponse = await this.event.waitForEvent<{
+      instruments: { index: number }[];
+    }>('instruments', BullexDigital.TIMEOUT, () => {
+      this.sendMessage('sendMessage', {
+        name: 'digital-option-instruments.get-instruments',
+        version: '1.0',
+        body: { instrument_type: 'digital-option', asset_id: ACTIVES[active] },
+      });
+    });
+
+    if (!getInstrumentsResponse) {
+      return {
+        bought: false,
+      };
+    }
+
+    const instrument_index = getInstrumentsResponse.instruments[0].index;
+
+    const generatePriceResponse = await this.event.waitForEvent<{
+      prices: Price[];
+    }>('client-price-generated', BullexDigital.TIMEOUT, () => {
+      this.sendMessage('subscribeMessage', {
+        name: 'price-splitter.client-price-generated',
+        version: '1.0',
+        params: {
+          routingFilters: {
+            instrument_type: 'digital-option',
+            asset_id: ACTIVES[active],
+            instrument_index,
+          },
+        },
+      });
+    });
+
+    if (!generatePriceResponse) {
+      return {
+        bought: false,
+      };
+    }
+
+    this.sendMessage('subscribeMessage', {
+      name: 'portfolio.position-changed',
+      version: '3.0',
+      params: {
+        routingFilters: {
+          user_id: 166392072,
+          user_balance_id: 1150681408,
+          instrument_type: 'digital-option',
+        },
+      },
+    });
+
+    this.sendMessage('subscribeMessage', {
+      name: 'portfolio.position-changed',
+      version: '3.0',
+      params: {
+        routingFilters: {
+          user_id: 166392072,
+          user_balance_id: this.balances[mode].id,
+          instrument_type: 'exchange-option',
+        },
+      },
+    });
+
+    const len = generatePriceResponse.prices.length;
+    const optionPrice = generatePriceResponse.prices[len - 1];
+
+    const [, option] = getExpirationTime(this.serverTimestamp, duration);
 
     const data = {
-      name: 'binary-options.open-option',
-      version: '1.0',
+      name: 'digital-options.place-digital-option',
+      version: '2.0',
       body: {
-        price,
-        active_id: ACTIVES[active],
-        expired,
-        direction: direction.toLocaleLowerCase(),
+        amount: price.toString(),
+        asset_id: ACTIVES[active],
         option_type_id: option,
         user_balance_id: this.balances[mode].id,
+        instrument_id: optionPrice[direction].symbol,
+        instrument_index,
       },
     };
 
     const response = await this.event.waitForEvent<BuyResponse>(
-      'socket-option-opened',
-      Bullex.TIMEOUT,
+      'digital-option-placed',
+      BullexDigital.TIMEOUT,
       () => this.sendMessage('sendMessage', data)
     );
 
@@ -336,11 +410,12 @@ export class Bullex {
       return result;
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+
     const response = await this.event.waitForEvent<BuyAndCheckWinResponse>(
-      'socket-option-closed',
-      duration * 60 * 1000 + Bullex.TIMEOUT,
-      () => {},
-      (data) => data.id === result.id
+      'position-changed',
+      10 * 60 * 1000 + BullexDigital.TIMEOUT,
+      () => {}
     );
 
     if (!response) {
@@ -349,8 +424,8 @@ export class Bullex {
       };
     }
 
-    const win = { win: true, equal: null, loose: false }[response.win];
-    const gains = parseFloat(response.profit_amount);
+    const gains = response.close_profit - price;
+    const win = gains === price ? null : gains > 0;
 
     return { bought: true, win, gains };
   }

@@ -1,7 +1,8 @@
 import { admin, db } from '../database/admin';
 
 import { Exnova } from '../api/exnova';
-import { Bullex } from '../api/bullex';
+import { BullexBinary } from '../api/bullex/binary';
+import { BullexDigital } from '../api/bullex/digital';
 
 import { currentTime, waitForTime } from '../helpers/time';
 
@@ -14,7 +15,7 @@ interface OperationResponse {
 }
 
 export class Bot {
-  private API: Exnova | Bullex;
+  private API: Exnova | BullexBinary | BullexDigital;
 
   private readonly query = db.collection('users').doc(this.user.id);
 
@@ -33,12 +34,14 @@ export class Bot {
 
   private mode: 'real' | 'demo';
 
-  public constructor(private user: User) {
+  public constructor(private user: User, operation: Operation) {
     const { email, password, ssid } = user.broker;
 
     this.API = {
       exnova: new Exnova(email, password, ssid),
-      bullex: new Bullex(email, password, ssid),
+      bullex: operation.active.includes('OTC')
+        ? new BullexDigital(email, password, ssid)
+        : new BullexBinary(email, password, ssid),
     }[user.broker.name];
 
     this.mode = this.user.config.mode;
@@ -49,9 +52,9 @@ export class Bot {
     password: string,
     broker: 'exnova' | 'bullex'
   ) {
-    const API: Exnova | Bullex = {
+    const API: Exnova | BullexBinary | BullexDigital = {
       exnova: new Exnova(email, password),
-      bullex: new Bullex(email, password),
+      bullex: new BullexBinary(email, password),
     }[broker];
 
     const success = await API.establishConnection();
