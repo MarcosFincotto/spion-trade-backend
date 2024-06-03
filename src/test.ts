@@ -16,7 +16,7 @@ export async function test() {
   console.log({ isConnected: API.isConnected() });
 
   const trade = await API.buyAndCheckWin({
-    active: 'EURJPY',
+    active: 'EURUSD-OTC',
     price: 100,
     direction: 'call',
     duration: 1,

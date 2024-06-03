@@ -418,13 +418,15 @@ export class BullexDigital {
       () => {}
     );
 
+    console.log({ response });
+
     if (!response) {
       return {
         bought: false,
       };
     }
 
-    const gains = response.close_profit - price;
+    const gains = response.close_profit;
     const win = gains === price ? null : gains > 0;
 
     return { bought: true, win, gains };

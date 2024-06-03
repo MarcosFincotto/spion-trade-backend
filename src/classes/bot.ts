@@ -238,11 +238,7 @@ export class Bot {
         };
       }
 
-      console.log({ balance: this.getBalance(), price });
-
       this.changeBalance(-price);
-
-      console.log({ newBalance: this.getBalance() });
 
       const now = currentTime();
 
